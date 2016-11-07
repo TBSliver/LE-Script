@@ -10,7 +10,7 @@ use lib "$Bin/local/lib/perl5";
 use JSON::MaybeXS qw/ decode_json /;
 use File::Spec;
 use Path::Tiny;
-use IPC::System::Simple qw/ systemx /;
+use IPC::System::Simple qw/ system /;
 
 my $live = $ARGV[0] || '';
 
@@ -42,6 +42,7 @@ path($challenge_path)->mkpath;
 
 while ( my ( $site, $urls ) = each %{ $config->{sites} } ) {
   my $raw_command = join ' ', qw/
+    perl -Ilocal\/lib\/perl5
     %s
     --email "%s"
     --key "%s"
@@ -83,7 +84,7 @@ while ( my ( $site, $urls ) = each %{ $config->{sites} } ) {
     $challenge_path,
   );
 
-  systemx( $command );
+  system( $command );
 
 }
 
