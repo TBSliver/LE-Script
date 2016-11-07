@@ -1,3 +1,5 @@
 /local
 /sites
 /certs
+/certs-dev
+/config.json

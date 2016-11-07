@@ -1,0 +1,86 @@
+#! /usr/bin/env perl
+
+use strict;
+use warnings;
+
+use JSON::MaybeXS qw/ decode_json /;
+use File::Spec;
+use FindBin qw/ $Bin /;
+use Path::Tiny;
+use IPC::System::Simple qw/ systemx /;
+
+my $live = $ARGV[0] || '';
+
+if ( $live eq 'live' ) {
+  print "Running against LE live system\n";
+} else {
+  print "Running against LE development system\n";
+}
+
+my $config_file_path = File::Spec->catfile($Bin, 'config.json');
+my $config;
+
+die "No config.json found" unless -f $config_file_path;
+
+my $config_file_contents = path($config_file_path)->slurp;
+$config = decode_json $config_file_contents;
+
+my $cert_dir = File::Spec->catdir($Bin, 'certs');
+
+if ( $live ne 'live' ) {
+  $cert_dir = File::Spec->catdir($Bin, 'certs-dev');
+}
+
+my $account_key_path = File::Spec->catdir($cert_dir, "${\$config->{email}}.key");
+
+my $challenge_path = File::Spec->catdir($Bin, 'challenge-root');
+
+path($challenge_path)->mkpath;
+
+while ( my ( $site, $urls ) = each %{ $config->{sites} } ) {
+  my $raw_command = join ' ', qw/
+    le.pl
+    --email "%s"
+    --key "%s"
+    --csr "%s"
+    --csr-key "%s"
+    --crt "%s"
+    --domains "%s"
+    --generate-missing
+    --path "%s"
+    --unlink
+  /;
+
+  if ( $live eq 'live' ) {
+    $raw_command .= ' --live';
+  }
+
+  my $site_path = File::Spec->catdir($cert_dir, $site);
+
+  my $csr_path = File::Spec->catfile($site_path, "$site.csr");
+  my $csr_key_path = File::Spec->catfile($site_path, "$site.key");
+  my $cert_path  = File::Spec->catfile($site_path, "$site.crt");
+  my $domains = join(',', @$urls);
+
+  if ( -f $cert_path ) {
+    $raw_command .= ' --renew 5';
+  }
+
+  path($site_path)->mkpath;
+
+  my $command = sprintf(
+    $raw_command,
+    $config->{email},
+    $account_key_path,
+    $csr_path,
+    $csr_key_path,
+    $cert_path,
+    $domains,
+    $challenge_path,
+  );
+
+  systemx( File::Spec->catfile($Bin, 'vendor/bin/carton'), 'exec', $command );
+
+}
+
+print "Done\n";
