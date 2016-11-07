@@ -42,7 +42,6 @@ path($challenge_path)->mkpath;
 
 while ( my ( $site, $urls ) = each %{ $config->{sites} } ) {
   my $raw_command = join ' ', qw/
-    le.pl
     --email "%s"
     --key "%s"
     --csr "%s"
@@ -82,7 +81,7 @@ while ( my ( $site, $urls ) = each %{ $config->{sites} } ) {
     $challenge_path,
   );
 
-  systemx( File::Spec->catfile($Bin, 'vendor/bin/carton'), 'exec', $command );
+  systemx( File::Spec->catfile($Bin, 'local', 'bin', 'le.pl'), $command );
 
 }
 
