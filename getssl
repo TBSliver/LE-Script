@@ -42,6 +42,7 @@ path($challenge_path)->mkpath;
 
 while ( my ( $site, $urls ) = each %{ $config->{sites} } ) {
   my $raw_command = join ' ', qw/
+    %s
     --email "%s"
     --key "%s"
     --csr "%s"
@@ -72,6 +73,7 @@ while ( my ( $site, $urls ) = each %{ $config->{sites} } ) {
 
   my $command = sprintf(
     $raw_command,
+    File::Spec->catfile($Bin, 'local', 'bin', 'le.pl'),
     $config->{email},
     $account_key_path,
     $csr_path,
@@ -81,12 +83,7 @@ while ( my ( $site, $urls ) = each %{ $config->{sites} } ) {
     $challenge_path,
   );
 
-  systemx(
-    'perl',
-    '-I' . File::Spec->catfile($Bin, 'local', 'lib', 'perl5'),
-    File::Spec->catfile($Bin, 'local', 'bin', 'le.pl'),
-    $command
-  );
+  systemx( $command );
 
 }
 
