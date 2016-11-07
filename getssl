@@ -81,7 +81,12 @@ while ( my ( $site, $urls ) = each %{ $config->{sites} } ) {
     $challenge_path,
   );
 
-  systemx( File::Spec->catfile($Bin, 'local', 'bin', 'le.pl'), $command );
+  systemx(
+    'perl',
+    '-I' . File::Spec->catfile($Bin, 'local', 'lib', 'perl5'),
+    File::Spec->catfile($Bin, 'local', 'bin', 'le.pl'),
+    $command
+  );
 
 }
 
