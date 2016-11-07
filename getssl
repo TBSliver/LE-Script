@@ -3,9 +3,12 @@
 use strict;
 use warnings;
 
+use FindBin qw/ $Bin /;
+
+use lib "$Bin/local/lib/perl5";
+
 use JSON::MaybeXS qw/ decode_json /;
 use File::Spec;
-use FindBin qw/ $Bin /;
 use Path::Tiny;
 use IPC::System::Simple qw/ systemx /;
 
