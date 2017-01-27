@@ -20,7 +20,9 @@ point to the correct folders inside this repo.
 
 ## Server Configuration
 
-### Apache 2.2
+These are some example configurations for some popular web servers - the basic idea however is to serve the challenge-root folder as a static file, with no way of browsing it (for security)
+
+### Apache
 
 This is assuming you are running Apache 2.2 - inside your VirtualHost entry, add the following (or an equivalent):
 
@@ -33,13 +35,20 @@ This is assuming you are running Apache 2.2 - inside your VirtualHost entry, add
   Alias /.well-known/acme-challenge/ /path/to/challenge-root/
 ```
 
-### Apache 2.4+
-
-*Coming soon - PR's welcome*
-
 ### Nginx
 
-*Coming soon - PR's welcome*
+*Currently un-tested* - Please let me know if it works, or if it requires changes!
+
+```
+location ^~ /.well-known/acme-challenge/ {
+  default_type "text/plain";
+  root /path/to/challenge-root/;
+}
+
+location = /.well-known/acme-challenge/ {
+  return 404;
+}
+```
 
 ## Configuration File
 
