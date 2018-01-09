@@ -67,7 +67,9 @@ while ( my ( $site, $urls ) = each %{ $config->{sites} } ) {
   my $domains = join(',', @$urls);
 
   if ( -f $cert_path ) {
-    $raw_command .= ' --renew 5';
+    $raw_command .= sprintf( ' --renew %d',
+      defined $config->{renew} ? $config->{renew} : 5
+    );
   }
 
   path($site_path)->mkpath;
