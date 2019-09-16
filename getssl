@@ -86,8 +86,11 @@ while ( my ( $site, $urls ) = each %{ $config->{sites} } ) {
     $challenge_path,
   );
 
-  system( $command );
+  eval { system( $command ) };
 
+  if ( my $err = $@ ) {
+    warn $@;
+  }
 }
 
 print "Done\n";
